@@ -1,42 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import { useState } from 'react';
 import ChatBox from '../components/ChatBox';
 import ChatInput from '../components/ChatInput';
 
-let socket;
-
-const Home = () => {
+export default function Home() {
   const [messages, setMessages] = useState([]);
-  const [isConnected, setIsConnected] = useState(false);
 
-  useEffect(() => {
-    socket = io(); // Connect to the server
+  const sendMessage = async (message) => {
+    const userMessage = { role: 'user', content: message };
+    setMessages((prev) => [...prev, userMessage]);
 
-    socket.on('connect', () => {
-      setIsConnected(true);
-      console.log('Connected to the server');
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message }),
     });
 
-    socket.on('chatMessage', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    return () => {
-      socket.off();
-    };
-  }, []);
-
-  const sendMessage = (message) => {
-    socket.emit('chatMessage', message); // Send message to the server
+    const data = await response.json();
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.content }]);
   };
 
   return (
-    <div className="container">
-      <h1 className="heading">Welcome to the Chat App</h1>
+    <div className="chat-container">
+      <h1>My Custom Chat App</h1>
       <ChatBox messages={messages} />
       <ChatInput sendMessage={sendMessage} />
     </div>
   );
-};
-
-export default Home;
+}

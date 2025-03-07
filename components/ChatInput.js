@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const ChatInput = ({ sendMessage }) => {
   const [input, setInput] = useState('');
@@ -16,8 +16,7 @@ const ChatInput = ({ sendMessage }) => {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-        placeholder="Type your message"
+        placeholder="Type a message..."
       />
       <button onClick={handleSend}>Send</button>
     </div>
